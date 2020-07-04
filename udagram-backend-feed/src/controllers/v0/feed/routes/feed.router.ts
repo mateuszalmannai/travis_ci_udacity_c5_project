@@ -6,6 +6,7 @@ import * as AWS from "../../../../aws";
 import * as c from "../../../../config/config";
 
 const router: Router = Router();
+const { v4: uuidv4 } = require("uuid");
 
 export function requireAuth(req: Request, res: Response, next: NextFunction) {
   if (!req.headers || !req.headers.authorization) {
@@ -31,9 +32,14 @@ export function requireAuth(req: Request, res: Response, next: NextFunction) {
 // Get all feed items
 router.get("/", async (req: Request, res: Response) => {
   const items = await FeedItem.findAndCountAll({ order: [["id", "DESC"]] });
+  let pid = uuidv4();
   items.rows.map((item) => {
     if (item.url) {
       item.url = AWS.getGetSignedUrl(item.url);
+      console.log(
+        new Date().toLocaleString() +
+          `: ${pid} - got signed URL for item: ${item}`
+      );
     }
   });
   res.send(items);
@@ -43,6 +49,10 @@ router.get("/", async (req: Request, res: Response) => {
 router.get("/:id", async (req: Request, res: Response) => {
   const { id } = req.params;
   const item = await FeedItem.findByPk(id);
+  let pid = uuidv4();
+  console.log(
+    new Date().toLocaleString() + `: ${pid} - got feed resource: ${item}`
+  );
   res.send(item);
 });
 
@@ -53,6 +63,11 @@ router.get(
   async (req: Request, res: Response) => {
     const { fileName } = req.params;
     const url = AWS.getPutSignedUrl(fileName);
+    let pid = uuidv4();
+    console.log(
+      new Date().toLocaleString() +
+        `: ${pid} - got signed URL: ${url} for filename: ${fileName}`
+    );
     res.status(201).send({ url: url });
   }
 );
@@ -80,6 +95,11 @@ router.post("/", requireAuth, async (req: Request, res: Response) => {
   const savedItem = await item.save();
 
   savedItem.url = AWS.getGetSignedUrl(savedItem.url);
+  let pid = uuidv4();
+  console.log(
+    new Date().toLocaleString() +
+      `: ${pid} - created URL: ${savedItem.url} for filename: ${fileName}`
+  );
   res.status(201).send(savedItem);
 });
 
