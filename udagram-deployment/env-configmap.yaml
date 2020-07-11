@@ -7,6 +7,6 @@ data:
   JWT_SECRET: helloworld
   POSTGRESS_DB: udrgmannaidev
   POSTGRESS_HOST: udrgmannaidev.cwozibfrwx7x.eu-central-1.rds.amazonaws.com
-  URL: http://localhost:8100
+  URL: a81a4945be7874b05b402e7f609d5c2c-741660516.eu-central-1.elb.amazonaws.com
 metadata:
   name: env-config
